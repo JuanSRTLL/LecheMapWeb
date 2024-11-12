@@ -57,7 +57,7 @@
                 </li>
                 <li class="step-item">
                     <span class="step-number">2</span>
-                    <span class="step-text">Haz clic en el botón "Iniciar"</span>
+                    <span class="step-text">Haz clic en el botón "Comenzar validación"</span>
                 </li>
                 <li class="step-item">
                     <span class="step-number">3</span>
