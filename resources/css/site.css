@@ -1,0 +1,366 @@
+﻿:root {
+    --primary-color: #3498db;
+    --secondary-color: #3498db;
+    --text-color: #333;
+    --bg-color: #f8f9fa;
+    --heading-color: #333;
+    --title-color: burlywood;
+    --input-bg: #fff;
+    --input-text: #333;
+    --button-bg: #fff;
+    --button-text: #333;
+    --chat-bg: #fff;
+    --chat-text: #333;
+    --file-upload-bg: #3498db;
+    --file-upload-text: #fff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--heading-color);
+}
+
+.header {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    padding: 10px 0;
+}
+
+.logo {
+    max-height: 150px;
+    width: auto;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    background-color: #fff;
+    overflow-x: auto;
+}
+
+.nav {
+    display: inline-flex;
+    position: relative;
+    overflow: hidden;
+    max-width: 100%;
+    background-color: #fff;
+    padding: 0 20px;
+    border-radius: 40px;
+    box-shadow: 0 10px 40px rgba(159, 162, 177, .8);
+}
+
+.nav-item {
+    color: #83818c;
+    padding: 20px;
+    text-decoration: none;
+    transition: .35s;
+    margin: 0 5px;
+    z-index: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    position: relative;
+    white-space: nowrap;
+}
+
+    .nav-item:before {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background-color: #dfe2ea;
+        border-radius: 8px 8px 0 0;
+        opacity: 0;
+        transition: .35s;
+    }
+
+    .nav-item:not(.is-active):hover:before {
+        opacity: 1;
+        bottom: 0;
+    }
+
+    .nav-item:not(.is-active):hover {
+        color: #333;
+    }
+
+.nav-indicator {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 5px;
+    transition: .45s;
+    z-index: 1;
+    border-radius: 8px 8px 0 0;
+}
+
+main {
+    flex-grow: 1;
+}
+
+footer {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 2rem 0;
+    margin-top: auto;
+}
+
+.footer-logo img {
+    max-width: 120px;
+}
+
+.social-icons a {
+    color: white;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    transition: color 0.3s ease;
+}
+
+    .social-icons a:hover {
+        color: var(--primary-color);
+    }
+
+.footer-link {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+    .footer-link:hover, .footer-link:focus {
+        color: var(--primary-color);
+        text-decoration: underline;
+    }
+
+/* Barra de accesibilidad */
+.barra-accesibilidad-govco {
+    height: 143px;
+    width: 48px;
+    position: fixed;
+    right: 0;
+    top: 35%;
+    background-color: #004884;
+    border-radius: 10px 0 0 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0 20px;
+    z-index: 1000;
+}
+
+    .barra-accesibilidad-govco button {
+        background: transparent;
+        border: none;
+        width: 48px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        cursor: pointer;
+    }
+
+        .barra-accesibilidad-govco button span {
+            position: absolute;
+            left: -180px;
+            top: 0;
+            background: #3366CC;
+            color: #fff;
+            padding: 10px;
+            width: 160px;
+            text-align: center;
+            border-radius: 10px 0 0 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            white-space: nowrap;
+            box-sizing: border-box;
+            pointer-events: none;
+            z-index: 1001;
+            display: none;
+        }
+
+        .barra-accesibilidad-govco button:hover span,
+        .barra-accesibilidad-govco button:focus span {
+            opacity: 1;
+            visibility: visible;
+            display: block;
+        }
+
+        .barra-accesibilidad-govco button i {
+            color: white;
+            font-size: 24px;
+        }
+
+/* Modo oscuro mejorado */
+.modo_oscuro-govco {
+    --text-color: #fff;
+    --bg-color: #121212;
+    --heading-color: #fff;
+    --title-color: #fff;
+    --input-bg: #1f1f1f;
+    --input-text: #fff;
+    --button-bg: #1f1f1f;
+    --button-text: #fff;
+    --chat-bg: #1f1f1f;
+    --chat-text: #fff;
+    --file-upload-bg: #1f1f1f;
+    --file-upload-text: #fff;
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+    /* Nuevas reglas para los contenedores específicos */
+    .modo_oscuro-govco .cia-container,
+    .modo_oscuro-govco .ge-container {
+        background-color: var(--bg-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .modo_oscuro-govco .cia-panel,
+    .modo_oscuro-govco .ge-panel {
+        background-color: var(--chat-bg) !important;
+        color: var(--chat-text) !important;
+        border-color: #333 !important;
+    }
+
+    .modo_oscuro-govco .cia-input,
+    .modo_oscuro-govco .ge-input {
+        background-color: var(--input-bg) !important;
+        color: var(--input-text) !important;
+        border-color: #333 !important;
+    }
+
+    .modo_oscuro-govco .cia-btn,
+    .modo_oscuro-govco .ge-btn {
+        background-color: var(--button-bg) !important;
+        color: var(--button-text) !important;
+        border-color: #fff !important;
+    }
+
+    .modo_oscuro-govco .ge-file-upload-label {
+        background-color: var(--file-upload-bg) !important;
+        color: var(--file-upload-text) !important;
+        border: 1px solid #fff !important;
+    }
+
+    .modo_oscuro-govco .ge-resultado-texto-container {
+        background-color: var(--chat-bg) !important;
+        color: var(--chat-text) !important;
+        border: 1px solid #333 !important;
+    }
+
+    .modo_oscuro-govco .header,
+    .modo_oscuro-govco .navbar-container,
+    .modo_oscuro-govco .nav {
+        background-color: #1f1f1f !important;
+    }
+
+    .modo_oscuro-govco .nav-item {
+        color: #fff !important;
+    }
+
+    .modo_oscuro-govco footer {
+        background-color: #1f1f1f !important;
+    }
+
+    /* Asegurar visibilidad de elementos de texto */
+    .modo_oscuro-govco h1,
+    .modo_oscuro-govco h2,
+    .modo_oscuro-govco h3,
+    .modo_oscuro-govco h4,
+    .modo_oscuro-govco h5,
+    .modo_oscuro-govco h6,
+    .modo_oscuro-govco p,
+    .modo_oscuro-govco span,
+    .modo_oscuro-govco div,
+    .modo_oscuro-govco label,
+    .modo_oscuro-govco input,
+    .modo_oscuro-govco textarea {
+        color: var(--text-color) !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .modo_oscuro-govco .card,
+    .modo_oscuro-govco .card-body {
+        background-color: #1f1f1f !important;
+        color: var(--text-color) !important;
+    }
+
+/* Estilos específicos para los títulos del proyecto */
+.project-title,
+.section-title,
+.info-card-title {
+    color: var(--title-color) !important;
+    font-weight: bold;
+}
+
+/* Estilos para el contenedor de carga */
+#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    display: none; /* Oculto por defecto */
+}
+
+    #loading img {
+        width: 100px; /* Ajusta el tamaño según sea necesario */
+        animation: spin 1s linear infinite;
+    }
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-container {
+        padding: 10px 0;
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav {
+        flex-wrap: nowrap;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 0 10px;
+    }
+
+    .nav-item {
+        padding: 15px 10px;
+        font-size: 14px;
+    }
+
+    .nav-indicator {
+        bottom: 0;
+    }
+}
