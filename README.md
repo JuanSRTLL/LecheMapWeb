@@ -1,8 +1,25 @@
-Configuración de Variables en Web.config
-En el archivo Web.config se encuentran tres variables de configuración esenciales para el funcionamiento del sistema. A continuación, se describen cada una de ellas y su propósito:
+# 🔧 Guía de Configuración del Sistema
 
-CohereApiKey: Este es el API Key para Cohere, utilizado para realizar llamadas a la API de Cohere. Asegúrese de reemplazar "APIKEY DE COHERE" con una clave válida de acceso.
-AppToken: Este token es utilizado para acceder a la API de Socrata en datos abiertos. Reemplace "TOKEN DE SOCRATA DATOS ABIERTOS" con el token de autenticación correspondiente para asegurar la conexión y el acceso adecuado a los datos abiertos.
-BingApiKey: Clave de API de Bing, utilizada para acceder a servicios de noticias de Bing. Reemplace "API DE BING PARA USO DE NOTICIAS" con la clave de API de Bing válida para habilitar el consumo de noticias en tiempo real.
-Recuerde actualizar estos valores en Web.config para que la aplicación funcione correctamente. Estos parámetros son necesarios para conectar y autenticar las distintas APIs que el sistema.
+## ℹ️ Información para Jurados concurso datos a la U
+**¡IMPORTANTE!** Para la evaluación del concurso de datos del MinTIC, por favor revisar el archivo `AsesoramientoIA.aspx.cs`. En este archivo encontrarán todas las URLs de consulta a la API de datos abiertos implementadas en el sistema.
 
+## ⚙️ Configuración de Variables 
+
+### Archivo Web.config
+El sistema requiere la configuración de tres variables esenciales en el archivo `Web.config`. Estas variables son críticas para el funcionamiento correcto de las diferentes integraciones con APIs externas.
+
+### Instrucciones de Configuración
+
+1. Abra el archivo `Web.config` en su editor preferido
+2. Localice las siguientes líneas:
+3. Modificar las keys con unas propias para funcionamiento.
+
+```xml
+<appSettings>
+   <add key="CohereApiKey" value="APIKEY DE COHERE"/>
+   <add key="AppToken" value="TOKEN DE SOCRATA DATOS ABIERTOS MINTIC"/>
+   <add key="BingApiKey" value="API DE BING PARA USO DE NOTICIAS"/>
+</appSettings>
+```
+
+⌨️ con ❤️ por [Equipo LECHEMAP](https://lechemap.gestionproyectoiot.com/) | 2024
