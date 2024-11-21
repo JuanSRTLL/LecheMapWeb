@@ -1,7 +1,11 @@
 ﻿<%@ Page Title="Asesoramiento Inteligente en Producción Lechera" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="AsesoramientoIA.aspx.cs" Inherits="LecheMap.AsesoramientoIA" Async="true" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <link rel="stylesheet" href="resources/css/asesoramientoia.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -10,7 +14,27 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <div class="cia-container">
+    <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" />
+
+    <script type="text/javascript">
+        // Configuración del menú contextual de Highcharts
+        Highcharts.setOptions({
+            lang: {
+                contextButtonTitle: 'Menú contextual',
+                viewFullscreen: 'Ver en pantalla completa',
+                printChart: 'Imprimir gráfico',
+                downloadPNG: 'Descargar imagen PNG',
+                downloadJPEG: 'Descargar imagen JPEG',
+                downloadPDF: 'Descargar documento PDF',
+                downloadSVG: 'Descargar imagen SVG',
+                downloadCSV: 'Descargar CSV',
+                downloadXLS: 'Descargar XLS',
+                viewData: 'Ver tabla de datos'
+            }
+        });
+    </script>
+
+    <div class="cia-container" id="top">
         <h1 class="cia-title">Asesoramiento Inteligente en Producción Lechera</h1>
         <div class="cia-description">
             <div class="welcome-text">
@@ -39,17 +63,32 @@
         <div class="banner">
             <p>El sistema usa los datos oficiales publicados en la plataforma de datos abiertos del gobierno.</p>
             <a href="https://www.datos.gov.co/Agricultura-y-Desarrollo-Rural/Zonificaci-n-de-aptitud-para-la-producci-n-de-lech/bfuy-8yvf/about_data" target="_blank">
-                <img src="https://herramientas.datos.gov.co/sites/default/files/pictures/logo_pda.png" alt="Logo PDA" />
+                <img class="banner-logo-pda" src="https://herramientas.datos.gov.co/sites/default/files/pictures/logo_pda.png" alt="Logo PDA" />
             </a>
         </div>
 
+        <!-- Título para las gráficas -->
+        <h2 class="text-center mb-4" style="color: #3498db;">Información general del país</h2>
+
         <div class="row mb-4">
-            <div class="col">
+            <div class="col-md-6">
                 <div id="topDepartmentsChart" style="height: 400px; margin: 20px auto;"></div>
             </div>
+            <div class="col-md-6">
+                <div id="topMunicipiosChart" style="height: 400px; margin: 20px auto;"></div>
+            </div>
         </div>
-        <div class="steps-container">
-            <h2 class="steps-title">Pasos para realizar tu consulta</h2>
+
+        <!-- Banner UPRA-->
+        <div class="banner">
+            <p>El dataset publicado en los datos abiertos pertenece a:</p>
+            <a href="https://upra.gov.co/es-co" target="_blank">
+                <img class="banner-logo-upra" src="resources/image/contenido/UPRA.PNG" alt="Logo UPRA" />
+            </a>
+        </div>
+
+        <div class="steps-container" id="steps">
+            <h2 class="steps-title">Para realizar un análisis de la viabilidad de inversión en municipios específicos y recibir asesoramiento con inteligencia artificial sigue estos pasos:</h2>
             <ul class="steps-list">
                 <li class="step-item">
                     <span class="step-number">1</span>
@@ -67,7 +106,6 @@
         </div>
 
         <asp:Label ID="lblErrorMessage" runat="server" CssClass="error-message" Visible="false"></asp:Label>
-        <asp:ScriptManager ID="ScriptManager1" runat="server" />
 
         <!-- Selección de departamento y municipio -->
         <div class="selection-container">
@@ -165,41 +203,31 @@
 
                         <asp:TemplateField HeaderText="Aptitud Alta">
                             <ItemTemplate>
-                                <asp:Label runat="server" Text='<%# Eval("AptitudAlta") %>'
-                                    data-label="Aptitud Alta:"
-                                    CssClass="aptitud-alta"></asp:Label>
+                                <asp:Label runat="server" Text='<%# Eval("AptitudAlta") %>' data-label="Aptitud Alta:" CssClass="aptitud-alta"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="Aptitud Media">
                             <ItemTemplate>
-                                <asp:Label runat="server" Text='<%# Eval("AptitudMedia") %>'
-                                    data-label="Aptitud Media:"
-                                    CssClass="aptitud-media"></asp:Label>
+                                <asp:Label runat="server" Text='<%# Eval("AptitudMedia") %>' data-label="Aptitud Media:" CssClass="aptitud-media"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="Aptitud Baja">
                             <ItemTemplate>
-                                <asp:Label runat="server" Text='<%# Eval("AptitudBaja") %>'
-                                    data-label="Aptitud Baja:"
-                                    CssClass="aptitud-baja"></asp:Label>
+                                <asp:Label runat="server" Text='<%# Eval("AptitudBaja") %>' data-label="Aptitud Baja:" CssClass="aptitud-baja"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="Exclusión Legal">
                             <ItemTemplate>
-                                <asp:Label runat="server" Text='<%# Eval("ExclusionLegal") %>'
-                                    data-label="Exclusión Legal:"
-                                    CssClass="exclusion-legal"></asp:Label>
+                                <asp:Label runat="server" Text='<%# Eval("ExclusionLegal") %>' data-label="Exclusión Legal:" CssClass="exclusion-legal"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
 
                         <asp:TemplateField HeaderText="No Apta">
                             <ItemTemplate>
-                                <asp:Label runat="server" Text='<%# Eval("NoApta") %>'
-                                    data-label="No Apta:"
-                                    CssClass="no-apta"></asp:Label>
+                                <asp:Label runat="server" Text='<%# Eval("NoApta") %>' data-label="No Apta:" CssClass="no-apta"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
                     </Columns>
@@ -254,7 +282,7 @@
                             style: {
                                 fontSize: '18px',
                                 fontWeight: 'bold',
-                                color: '#333'
+                                color: '#3498db'
                             }
                         },
                         tooltip: {
@@ -408,20 +436,10 @@
                 });
             }
 
-            // Código existente del DOMContentLoaded
+            
             checkStartFormValidity();
 
-            // Configurar el saludo
-            var now = new Date();
-            var hour = now.getHours();
-            var greetingText = hour < 12 ? 'Buenos días' :
-                hour < 19 ? 'Buenas tardes' :
-                    'Buenas noches';
-
-            var greetingElement = document.getElementById('greeting');
-            if (greetingElement) {
-                greetingElement.textContent = greetingText + ' 👋';
-            }
+          
 
             // Agregar eventos para validación
             var ddlMunicipios = document.getElementById('<%= ddlMunicipios.ClientID %>');
@@ -430,8 +448,7 @@
             if (ddlMunicipios) ddlMunicipios.addEventListener('change', checkStartFormValidity);
             if (txtMessage) txtMessage.addEventListener('input', checkChatFormValidity);
         });
-    </script>
-    <script>
+
         function createTopDepartmentsChart(data) {
             // Agrupar datos por departamento y sumar aptitud_alta_ha
             const departmentData = {};
@@ -451,17 +468,20 @@
                 .sort((a, b) => b.y - a.y)
                 .slice(0, 10);
 
-            // Crear el gráfico
+            // Crear el gráfico dependiendo del tamaño de la pantalla
+            const isMobile = window.innerWidth <= 768; // Detectar si es móvil
+            const chartType = isMobile ? 'bar' : 'column'; // Gráfico de barras para móviles, columnas para escritorio
+
             Highcharts.chart('topDepartmentsChart', {
                 chart: {
-                    type: 'column',
+                    type: chartType, // Cambiar tipo de gráfico según el tamaño de pantalla
                     backgroundColor: '#f9f9f9', // Fondo claro
                     borderColor: '#ccc',
                     borderWidth: 1,
                     borderRadius: 5
                 },
                 title: {
-                    text: 'Top 10 Departamentos con Mayor Área de Aptitud Alta',
+                    text: 'Top 5 Departamentos con Mayor Área de Aptitud Alta',
                     style: {
                         fontSize: '18px',
                         fontWeight: 'bold',
@@ -471,7 +491,6 @@
                 xAxis: {
                     type: 'category',
                     labels: {
-                        rotation: -45,
                         style: {
                             fontSize: '13px',
                             color: '#333'
@@ -514,7 +533,7 @@
                     }
                 }],
                 plotOptions: {
-                    column: {
+                    [chartType]: {
                         borderRadius: 5,
                         dataLabels: {
                             enabled: true
@@ -525,6 +544,100 @@
         }
 
         window.createTopDepartmentsChart = createTopDepartmentsChart;
+
+        function createTopMunicipiosChart(data) {
+            // Agrupar datos por municipio y sumar aptitud_alta_ha
+            const municipioData = {};
+            data.forEach(item => {
+                const municipio = item.municipio;
+                const aptitudAlta = parseFloat(item.aptitud_alta_ha || 0);
+
+                if (!municipioData[municipio]) {
+                    municipioData[municipio] = 0;
+                }
+                municipioData[municipio] += aptitudAlta;
+            });
+
+            // Convertir a array y ordenar
+            const sortedData = Object.entries(municipioData)
+                .map(([municipio, value]) => ({ name: municipio, y: value }))
+                .sort((a, b) => b.y - a.y)
+                .slice(0, 10);
+
+            // Crear el gráfico dependiendo del tamaño de la pantalla
+            const isMobile = window.innerWidth <= 768; // Detectar si es móvil
+            const chartType = isMobile ? 'bar' : 'column'; // Gráfico de barras para móviles, columnas para escritorio
+
+            Highcharts.chart('topMunicipiosChart', {
+                chart: {
+                    type: chartType, // Cambiar tipo de gráfico según el tamaño de pantalla
+                    backgroundColor: '#f9f9f9', // Fondo claro
+                    borderColor: '#ccc',
+                    borderWidth: 1,
+                    borderRadius: 5
+                },
+                title: {
+                    text: 'Top 5 Municipios con Mayor Área de Aptitud Alta',
+                    style: {
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        color: '#333'
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    labels: {
+                        style: {
+                            fontSize: '13px',
+                            color: '#333'
+                        }
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Hectáreas',
+                        style: {
+                            color: '#333'
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return Highcharts.numberFormat(this.value, 0);
+                        }
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.point.name + '</b><br/>' +
+                            'Área de aptitud alta: ' + Highcharts.numberFormat(this.y, 0) + ' ha';
+                    }
+                },
+                series: [{
+                    name: 'Aptitud Alta',
+                    data: sortedData,
+                    color: '#2f7ed8',
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y:.1f} ha', // Formato del texto
+                        style: {
+                            color: '#000000', // Cambiar el color a negro
+                            textOutline: 'none' // Sin contorno
+                        }
+                    }
+                }],
+                plotOptions: {
+                    [chartType]: {
+                        borderRadius: 5,
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                }
+            });
+        }
 
         function endConsultation() {
             // Recargar la página completamente

@@ -14,14 +14,12 @@ namespace LecheMap
     public partial class AsesoramientoIA : System.Web.UI.Page
     {
         protected HiddenField hdnChartData;
-        
+
         private CohereApiClient _cohereApiClient;
         private static List<AptitudData> aptitudDataList = new List<AptitudData>();
 
         protected async void Page_Load(object sender, EventArgs e)
         {
-           
-
             if (!IsPostBack)
             {
                 if (Session["CohereApiClient"] == null)
@@ -41,6 +39,8 @@ namespace LecheMap
 
                 await LoadAptitudDataAsync();
                 LoadDepartamentos();
+                await LoadTopDepartmentsDataAsync(); // Cargar los datos de departamentos
+                await LoadTopMunicipiosDataAsync(); // Cargar los datos de los municipios
             }
             else
             {
@@ -56,9 +56,73 @@ namespace LecheMap
                     ScriptManager.RegisterStartupScript(this, GetType(), "RecreateTopDepartmentsChart",
                         $"createTopDepartmentsChart({hdnChartData.Value});", true);
                 }
+
+                // Recrear el gráfico de Top 10 Municipios
+                if (Session["TopMunicipiosData"] != null)
+                {
+                    string topMunicipiosJson = Session["TopMunicipiosData"].ToString();
+                    ScriptManager.RegisterStartupScript(this, GetType(), "RecreateTopMunicipiosChart",
+                        $"createTopMunicipiosChart({topMunicipiosJson});", true);
+                }
             }
         }
 
+        private async Task LoadTopDepartmentsDataAsync()
+        {
+            string apiUrl = "https://www.datos.gov.co/resource/bfuy-8yvf.json?$query=SELECT%20departamen,%20ROUND(SUM(area_ha)%20FILTER%20(WHERE%20aptitud%20=%20'Aptitud%20alta'),%200)%20AS%20aptitud_alta_ha%20WHERE%20departamen%20IS%20NOT%20NULL%20AND%20aptitud%20=%20'Aptitud%20alta'%20GROUP%20BY%20departamen%20HAVING%20SUM(area_ha)%20>%200%20ORDER%20BY%20aptitud_alta_ha%20DESC%20LIMIT%205";
+
+            string appToken = ConfigurationManager.AppSettings["AppToken"];
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("X-App-Token", appToken);
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    hdnChartData.Value = json; // Guardar los datos en el HiddenField
+                    Session["TopDepartmentsData"] = json; // Guardar en sesión
+
+                    // Llamar a la función de JavaScript para crear el gráfico
+                    ScriptManager.RegisterStartupScript(this, GetType(), "CreateTopDepartmentsChart",
+                        $"createTopDepartmentsChart({json});", true);
+                }
+                else
+                {
+                    string error = $"No se pudo obtener los datos de los departamentos. Código de estado: {response.StatusCode}";
+                    ShowError(error);
+                }
+            }
+        }
+
+        private async Task LoadTopMunicipiosDataAsync()
+        {
+            string apiUrl = "https://www.datos.gov.co/resource/bfuy-8yvf.json?$query=SELECT municipio, ROUND(SUM(area_ha) FILTER (WHERE aptitud = 'Aptitud alta'), 0) AS aptitud_alta_ha WHERE municipio IS NOT NULL AND aptitud = 'Aptitud alta' GROUP BY municipio HAVING SUM(area_ha) > 0 ORDER BY aptitud_alta_ha DESC LIMIT 5";
+
+            string appToken = ConfigurationManager.AppSettings["AppToken"];
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("X-App-Token", appToken);
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    Session["TopMunicipiosData"] = json; // Guardar en sesión
+
+                    // Llamar a la función de JavaScript para crear el gráfico
+                    ScriptManager.RegisterStartupScript(this, GetType(), "CreateTopMunicipiosChart",
+                        $"createTopMunicipiosChart({json});", true);
+                }
+                else
+                {
+                    string error = $"No se pudo obtener los datos de los municipios. Código de estado: {response.StatusCode}";
+                    ShowError(error);
+                }
+            }
+        }
 
         public class BingNewsService
         {
@@ -95,6 +159,7 @@ namespace LecheMap
                 }
             }
         }
+
         public static class MessageFormatter
         {
             public static string FormatMessage(string message)
@@ -129,6 +194,7 @@ namespace LecheMap
                 return message;
             }
         }
+
 
         public class FormattedAptitudData
         {
@@ -269,8 +335,8 @@ namespace LecheMap
                     // Guardar el JSON directamente en el HiddenField
                     hdnChartData.Value = json;
 
-                    ScriptManager.RegisterStartupScript(this, GetType(), "CreateTopDepartmentsChart",
-                        $"createTopDepartmentsChart({json});", true);
+                    // Llamar a la función para cargar los datos de los Top 10 departamentos
+                    await LoadTopDepartmentsDataAsync();
                 }
                 else
                 {
@@ -437,50 +503,50 @@ namespace LecheMap
         }
 
         protected async void btnSend_Click(object sender, EventArgs e)
-{
-    try
-    {
-        string message = txtMessage.Text.Trim();
-        if (string.IsNullOrEmpty(message))
         {
-            ShowError("Por favor, ingresa un mensaje antes de consultar.");
-            return;
+            try
+            {
+                string message = txtMessage.Text.Trim();
+                if (string.IsNullOrEmpty(message))
+                {
+                    ShowError("Por favor, ingresa un mensaje antes de consultar.");
+                    return;
+                }
+
+                // Lógica para enviar el mensaje a la IA
+                string conversationId = Session["ConversationId"] as string;
+                var response = await _cohereApiClient.SendMessage(message, conversationId);
+
+                // Agregar mensajes al chat
+                AddMessageToChat("Usuario", message);
+                AddMessageToChat("Asistente", response.Generations[0].Text);
+
+                // Limpiar el campo de texto
+                txtMessage.Text = string.Empty;
+                txtMessage.Focus();
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Ocurrió un error al procesar tu consulta: {ex.Message}");
+            }
         }
-
-        // Lógica para enviar el mensaje a la IA
-        string conversationId = Session["ConversationId"] as string;
-        var response = await _cohereApiClient.SendMessage(message, conversationId);
-
-        // Agregar mensajes al chat
-        AddMessageToChat("Usuario", message);
-        AddMessageToChat("Asistente", response.Generations[0].Text);
-
-        // Limpiar el campo de texto
-        txtMessage.Text = string.Empty;
-        txtMessage.Focus();
-    }
-    catch (Exception ex)
-    {
-        ShowError($"Ocurrió un error al procesar tu consulta: {ex.Message}");
-    }
-}
 
         private void UpdateGridView(FormattedAptitudData data)
         {
             var displayData = new[]
             {
-        new
-        {
-            Departamento = data.departamen,
-            Municipio = data.municipio,
-            TotalArea = FormatHectares(data.total_area_ha),
-            AptitudAlta = FormatHectaresWithPercentage(data.aptitud_alta_ha, data.aptitud_alta_pct),
-            AptitudMedia = FormatHectaresWithPercentage(data.aptitud_media_ha, data.aptitud_media_pct),
-            AptitudBaja = FormatHectaresWithPercentage(data.aptitud_baja_ha, data.aptitud_baja_pct),
-            ExclusionLegal = FormatHectaresWithPercentage(data.exclusion_legal_ha, data.exclusion_legal_pct),
-            NoApta = FormatHectaresWithPercentage(data.no_apta_ha, data.no_apta_pct)
-        }
-    };
+                new
+                {
+                    Departamento = data.departamen,
+                    Municipio = data.municipio,
+                    TotalArea = FormatHectares(data.total_area_ha),
+                    AptitudAlta = FormatHectaresWithPercentage(data.aptitud_alta_ha, data.aptitud_alta_pct),
+                    AptitudMedia = FormatHectaresWithPercentage(data.aptitud_media_ha, data.aptitud_media_pct),
+                    AptitudBaja = FormatHectaresWithPercentage(data.aptitud_baja_ha, data.aptitud_baja_pct),
+                    ExclusionLegal = FormatHectaresWithPercentage(data.exclusion_legal_ha, data.exclusion_legal_pct),
+                    NoApta = FormatHectaresWithPercentage(data.no_apta_ha, data.no_apta_pct)
+                }
+            };
 
             gvAptitudData.DataSource = displayData;
             gvAptitudData.DataBind();
@@ -524,14 +590,12 @@ namespace LecheMap
             lblErrorMessage.Visible = true;
         }
 
-        
         public class AptitudMapData
         {
             public Dictionary<string, object> the_geom { get; set; }
             public string aptitud { get; set; }
         }
 
-        // Agrega este método a la clase AsesoramientoIA
         private async Task LoadMapDataAsync(string departamento, string municipio)
         {
             string apiUrl = $"https://www.datos.gov.co/resource/bfuy-8yvf.json?$query=SELECT%20the_geom,%20aptitud%20WHERE%20departamen%20=%20'{departamento}'%20AND%20municipio%20=%20'{municipio}'";
@@ -570,6 +634,7 @@ namespace LecheMap
                 }
             }
         }
+
         private void AddMessageToChat(string sender, string message)
         {
             string formattedMessage = MessageFormatter.FormatMessage(message);
@@ -587,6 +652,7 @@ namespace LecheMap
             string loadingMessage = "<p class='loading-message'>Generando...</p>";
             chatContainer.InnerHtml = chatContainer.InnerHtml.Replace(loadingMessage, "");
         }
+
         protected void gvAptitudData_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             if (e.Row.RowType == DataControlRowType.DataRow)
@@ -596,4 +662,3 @@ namespace LecheMap
         }
     }
 }
-

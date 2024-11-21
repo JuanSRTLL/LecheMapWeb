@@ -125,9 +125,8 @@
     <Content Include="Global.asax" />
     <Content Include="resources\css\asesoramientoia.css" />
     <Content Include="resources\css\site.css" />
+    <Content Include="resources\image\contenido\UPRA.png" />
     <Content Include="resources\image\logos\arvumlogopc.webp" />
-    <Content Include="resources\image\temp\a1d9ca3d-1497-4f3c-8738-043afa4770c2.jpg" />
-    <Content Include="resources\image\temp\Captura de pantalla 2024-10-26 181409.png" />
     <Content Include="resources\js\asesoramientoia.js" />
     <Content Include="resources\js\site.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />

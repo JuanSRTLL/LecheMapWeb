@@ -1,9 +1,8 @@
-﻿// Mostrar el contenedor de carga cuando la página comienza a recargarse
+﻿// Event listeners para carga de página
 window.addEventListener('beforeunload', function () {
     document.getElementById('loading').style.display = 'flex';
 });
 
-// Ocultar el contenedor de carga cuando la página se haya cargado
 window.addEventListener('load', function () {
     document.getElementById('loading').style.display = 'none';
 });
@@ -23,51 +22,161 @@ function hideAllTooltips() {
     });
 }
 
-// Función para cambiar el contraste
+// Función mejorada para cambiar el contraste
 function cambiarContexto(event) {
     event.preventDefault();
     const body = document.body;
     body.classList.toggle('modo_oscuro-govco');
 
-    // Asegurar que todos los elementos de texto sean visibles
-    const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span:not(.barra-accesibilidad-govco button span), div, label, input, textarea');
-    textElements.forEach(element => {
-        element.style.visibility = 'visible';
-        element.style.opacity = '1';
+    // Lista de elementos para aplicar contraste
+    const elements = {
+        text: 'h1, h2, h3, h4, h5, h6, p, span:not(.barra-accesibilidad-govco button span), div, label, input, textarea',
+        containers: '.cia-container, .ge-container, .cia-panel, .ge-panel, .selection-container, .steps-container',
+        buttons: '.cia-btn-iniciar, .cia-btn-enviar, .btn',
+        inputs: '.form-control, .cia-input, .cia-dropdown',
+        steps: '.step-item, .step-number, .step-text',
+        chat: '.cia-chat-container, .cia-input-container',
+        tables: '.table, .table th, .table td',
+        cards: '.card, .card-header, .card-body, .card-title'
+    };
 
-        if (body.classList.contains('modo_oscuro-govco')) {
-            element.style.color = '#fff';
-        } else {
-            element.style.color = '';
+    const isDarkMode = body.classList.contains('modo_oscuro-govco');
+    const darkModeStyles = {
+        backgroundColor: '#1f1f1f',
+        color: '#ffffff',
+        borderColor: '#ffffff'
+    };
+
+    const lightModeStyles = {
+        backgroundColor: '',
+        color: '',
+        borderColor: ''
+    };
+
+    // Aplicar estilos basados en el modo
+    const currentStyles = isDarkMode ? darkModeStyles : lightModeStyles;
+
+    // Aplicar estilos a elementos de texto
+    document.querySelectorAll(elements.text).forEach(element => {
+        if (!element.closest('.highcharts-container')) {
+            element.style.color = currentStyles.color;
+            element.style.visibility = 'visible';
+            element.style.opacity = '1';
         }
     });
 
-    // Manejar específicamente los contenedores de asesoramiento y detección
-    const specialContainers = document.querySelectorAll('.cia-container, .ge-container, .cia-panel, .ge-panel');
-    specialContainers.forEach(container => {
-        container.style.visibility = 'visible';
-        container.style.opacity = '1';
+    // Aplicar estilos a contenedores
+    document.querySelectorAll(elements.containers).forEach(container => {
+        container.style.backgroundColor = currentStyles.backgroundColor;
+        container.style.color = currentStyles.color;
+        container.style.borderColor = currentStyles.borderColor;
     });
 
-    // Restaurar estilos específicos para botones de carga de archivos
-    const fileUploadLabels = document.querySelectorAll('.ge-file-upload-label');
-    fileUploadLabels.forEach(label => {
-        if (body.classList.contains('modo_oscuro-govco')) {
-            label.style.backgroundColor = '#1f1f1f';
-            label.style.color = '#fff';
-            label.style.border = '1px solid #fff';
+    // Aplicar estilos a botones
+    document.querySelectorAll(elements.buttons).forEach(button => {
+        if (isDarkMode) {
+            button.style.backgroundColor = '#3498db';
+            button.style.color = '#ffffff';
+            button.style.borderColor = '#ffffff';
         } else {
-            label.style.backgroundColor = '#3498db';
-            label.style.color = '#fff';
-            label.style.border = 'none';
+            button.style.backgroundColor = '';
+            button.style.color = '';
+            button.style.borderColor = '';
         }
+    });
+
+    // Aplicar estilos a inputs
+    document.querySelectorAll(elements.inputs).forEach(input => {
+        if (isDarkMode) {
+            input.style.backgroundColor = '#2c2c2c';
+            input.style.color = '#ffffff';
+            input.style.borderColor = '#ffffff';
+        } else {
+            input.style.backgroundColor = '';
+            input.style.color = '';
+            input.style.borderColor = '';
+        }
+    });
+
+    // Aplicar estilos a los pasos
+    document.querySelectorAll(elements.steps).forEach(step => {
+        step.style.backgroundColor = currentStyles.backgroundColor;
+        step.style.color = currentStyles.color;
+        if (isDarkMode) {
+            if (step.classList.contains('step-number')) {
+                step.style.backgroundColor = '#3498db';
+            }
+        } else {
+            if (step.classList.contains('step-number')) {
+                step.style.backgroundColor = '';
+            }
+        }
+    });
+
+    // Aplicar estilos al chat
+    document.querySelectorAll(elements.chat).forEach(chatElement => {
+        chatElement.style.backgroundColor = currentStyles.backgroundColor;
+        chatElement.style.borderColor = currentStyles.borderColor;
+    });
+
+    // Aplicar estilos a las tablas
+    document.querySelectorAll(elements.tables).forEach(tableElement => {
+        tableElement.style.backgroundColor = currentStyles.backgroundColor;
+        tableElement.style.color = currentStyles.color;
+        tableElement.style.borderColor = currentStyles.borderColor;
+    });
+
+    // Aplicar estilos a las cards
+    document.querySelectorAll(elements.cards).forEach(card => {
+        if (isDarkMode) {
+            card.style.backgroundColor = '#2c2c2c';
+            card.style.color = '#ffffff';
+            card.style.borderColor = '#ffffff';
+        } else {
+            card.style.backgroundColor = '';
+            card.style.color = '';
+            card.style.borderColor = '';
+        }
+    });
+
+    // Ajustar estilos de los gráficos de Highcharts
+    const charts = Highcharts.charts.filter(chart => chart);
+    charts.forEach(chart => {
+        const theme = isDarkMode ? {
+            backgroundColor: '#1f1f1f',
+            textColor: '#ffffff',
+            lineColor: '#ffffff'
+        } : {
+            backgroundColor: '#ffffff',
+            textColor: '#333333',
+            lineColor: '#cccccc'
+        };
+
+        chart.update({
+            chart: {
+                backgroundColor: theme.backgroundColor
+            },
+            title: {
+                style: { color: theme.textColor }
+            },
+            xAxis: {
+                labels: { style: { color: theme.textColor } },
+                lineColor: theme.lineColor,
+                gridLineColor: theme.lineColor
+            },
+            yAxis: {
+                labels: { style: { color: theme.textColor } },
+                lineColor: theme.lineColor,
+                gridLineColor: theme.lineColor
+            },
+            legend: {
+                itemStyle: { color: theme.textColor }
+            }
+        });
     });
 
     // Guardar preferencia en localStorage
-    localStorage.setItem('darkMode', body.classList.contains('modo_oscuro-govco'));
-
-    // Asegurarse de ocultar todos los tooltips
-    hideAllTooltips();
+    localStorage.setItem('darkMode', isDarkMode);
 }
 
 // Función para cambiar el tamaño de fuente
@@ -83,7 +192,6 @@ function cambiarTamanio(event, operador) {
     document.documentElement.style.fontSize = `${currentFontSize}px`;
     localStorage.setItem('fontSize', currentFontSize);
 
-    // Ocultar los tooltips después del clic
     hideAllTooltips();
 }
 
@@ -109,126 +217,34 @@ function handleIndicator(el) {
     }
 }
 
-// Función para establecer el elemento de menú activo
-function setActiveMenuItem() {
-    const currentPath = window.location.pathname.toLowerCase();
-    const menuItems = document.querySelectorAll('.nav-item');
+// Función para validar el formulario de inicio
+function checkStartFormValidity() {
+    const departamento = document.getElementById('ddlDepartamentos');
+    const municipio = document.getElementById('ddlMunicipios');
+    const btnIniciar = document.querySelector('.cia-btn-iniciar');
 
-    menuItems.forEach(item => {
-        const itemPath = item.getAttribute('href').split('/').pop().toLowerCase();
-        const itemPathWithoutExtension = itemPath.replace('.aspx', '');
-
-        if (currentPath.endsWith(itemPathWithoutExtension) ||
-            (currentPath === '/' && itemPathWithoutExtension === 'index')) {
-            handleIndicator(item);
-        }
-    });
+    if (departamento && municipio && btnIniciar) {
+        btnIniciar.disabled = !departamento.value || !municipio.value;
+        btnIniciar.style.opacity = btnIniciar.disabled ? '0.6' : '1';
+    }
 }
 
-// Función para manejar los tooltips de accesibilidad
-function setupAccessibilityTooltips() {
-    const buttons = document.querySelectorAll('.barra-accesibilidad-govco button');
-    let activeTooltip = null;
-
-    buttons.forEach(button => {
-        const span = button.querySelector('span');
-        if (!span) return;
-
-        // Ocultar tooltip al inicio
-        span.style.visibility = 'hidden';
-        span.style.opacity = '0';
-        span.style.display = 'none';
-
-        // Mostrar tooltip al pasar el mouse
-        button.addEventListener('mouseenter', () => {
-            hideAllTooltips();
-            span.style.visibility = 'visible';
-            span.style.opacity = '1';
-            span.style.display = 'block';
-            activeTooltip = span;
-        });
-
-        // Ocultar tooltip al salir el mouse
-        button.addEventListener('mouseleave', () => {
-            span.style.visibility = 'hidden';
-            span.style.opacity = '0';
-            span.style.display = 'none';
-            if (activeTooltip === span) {
-                activeTooltip = null;
-            }
-        });
-
-        // Ocultar tooltip después del clic
-        button.addEventListener('click', () => {
-            hideAllTooltips();
-        });
-
-        // Accesibilidad del teclado
-        button.addEventListener('focus', () => {
-            hideAllTooltips();
-            span.style.visibility = 'visible';
-            span.style.opacity = '1';
-            span.style.display = 'block';
-            activeTooltip = span;
-        });
-
-        button.addEventListener('blur', () => {
-            span.style.visibility = 'hidden';
-            span.style.opacity = '0';
-            span.style.display = 'none';
-            if (activeTooltip === span) {
-                activeTooltip = null;
-            }
-        });
-
-        button.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                button.click();
-                hideAllTooltips();
-            }
-        });
-    });
-
-    // Cerrar tooltips al hacer clic fuera
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.barra-accesibilidad-govco')) {
-            hideAllTooltips();
-            activeTooltip = null;
-        }
-    });
-}
-
-// Función para inicializar la navegación
-function setupNavigation() {
-    const items = document.querySelectorAll('.nav-item');
-
-    items.forEach(item => {
-        item.addEventListener('click', (e) => {
-            handleIndicator(e.target);
-        });
-
-        if (item.classList.contains('is-active')) {
-            handleIndicator(item);
-        }
+// Función para mostrar/ocultar elementos de carga
+function toggleLoadingElements(show) {
+    const loadingElements = document.querySelectorAll('.loading-indicator');
+    loadingElements.forEach(element => {
+        element.style.display = show ? 'block' : 'none';
     });
 }
 
 // Función para restaurar las preferencias del usuario
 function restoreUserPreferences() {
-    // Restaurar modo oscuro
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode === 'true') {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (savedDarkMode) {
         document.body.classList.add('modo_oscuro-govco');
-        const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span:not(.barra-accesibilidad-govco button span), div, label, input, textarea');
-        textElements.forEach(element => {
-            element.style.visibility = 'visible';
-            element.style.opacity = '1';
-            element.style.color = '#fff';
-        });
+        cambiarContexto({ preventDefault: () => { } });
     }
 
-    // Restaurar tamaño de fuente
     const savedFontSize = localStorage.getItem('fontSize');
     if (savedFontSize) {
         currentFontSize = parseInt(savedFontSize);
@@ -236,25 +252,90 @@ function restoreUserPreferences() {
     }
 }
 
-// Event Listener principal cuando el DOM está cargado
+// Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function () {
-    // Restaurar preferencias del usuario
     restoreUserPreferences();
-
-    // Configurar navegación
-    setupNavigation();
-
-    // Configurar tooltips de accesibilidad
     setupAccessibilityTooltips();
+    setupNavigation();
+    checkStartFormValidity();
 
-    // Establecer menú activo inicial
-    setActiveMenuItem();
+    // Configurar eventos para los dropdowns
+    const departamentos = document.getElementById('ddlDepartamentos');
+    const municipios = document.getElementById('ddlMunicipios');
+    if (departamentos && municipios) {
+        departamentos.addEventListener('change', checkStartFormValidity);
+        municipios.addEventListener('change', checkStartFormValidity);
+    }
 
-    // Asegurarse de que los tooltips estén ocultos al inicio
-    hideAllTooltips();
+    // Configurar el chat si está presente
+    const chatContainer = document.getElementById('chatContainer');
+    if (chatContainer) {
+        setupChat();
+    }
 });
 
-// Event Listener para cuando la ventana se redimensiona
+// Configuración de navegación
+function setupNavigation() {
+    const items = document.querySelectorAll('.nav-item');
+    items.forEach(item => {
+        item.addEventListener('click', (e) => {
+            handleIndicator(e.target);
+        });
+        if (item.classList.contains('is-active')) {
+            handleIndicator(item);
+        }
+    });
+}
+
+// Configuración de tooltips de accesibilidad
+function setupAccessibilityTooltips() {
+    const buttons = document.querySelectorAll('.barra-accesibilidad-govco button');
+    buttons.forEach(button => {
+        const span = button.querySelector('span');
+        if (!span) return;
+
+        button.addEventListener('mouseenter', () => {
+            hideAllTooltips();
+            span.style.visibility = 'visible';
+            span.style.opacity = '1';
+            span.style.display = 'block';
+        });
+
+        button.addEventListener('mouseleave', () => {
+            span.style.visibility = 'hidden';
+            span.style.opacity = '0';
+            span.style.display = 'none';
+        });
+
+        button.addEventListener('focus', () => {
+            hideAllTooltips();
+            span.style.visibility = 'visible';
+            span.style.opacity = '1';
+            span.style.display = 'block';
+        });
+
+        button.addEventListener('blur', () => {
+            span.style.visibility = 'hidden';
+            span.style.opacity = '0';
+            span.style.display = 'none';
+        });
+    });
+}
+
+// Configuración del chat
+function setupChat() {
+    const chatInput = document.getElementById('txtMessage');
+    const sendButton = document.getElementById('btnSend');
+
+    if (chatInput && sendButton) {
+        chatInput.addEventListener('input', () => {
+            sendButton.disabled = !chatInput.value.trim();
+            sendButton.style.opacity = sendButton.disabled ? '0.6' : '1';
+        });
+    }
+}
+
+// Event listeners para la ventana
 window.addEventListener('resize', function () {
     const activeItem = document.querySelector('.nav-item.is-active');
     if (activeItem) {
@@ -262,9 +343,7 @@ window.addEventListener('resize', function () {
     }
 });
 
-// Event Listener para cuando se completa la carga de la página
 window.addEventListener('load', function () {
     setActiveMenuItem();
-    // Asegurarse de que los tooltips estén ocultos al cargar la página
     hideAllTooltips();
 });

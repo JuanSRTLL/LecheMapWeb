@@ -12,7 +12,7 @@
 }
 
 .cia-title {
-    color: #deb886; /* Color del título */
+    color: #3498db; /* Color del título */
     margin-bottom: 1.5rem;
     text-align: center;
     font-family: 'Montserrat', sans-serif;
@@ -82,7 +82,7 @@
 }
 
 .steps-title {
-    color: #333;
+    color: #3498db;
     font-size: 1.5rem;
     margin-bottom: 15px;
     text-align: center;
@@ -227,7 +227,7 @@
     }
 
 .card-title {
-    color: #2c3e50;
+    color: #3498db;
     font-weight: 600;
 }
 
@@ -521,17 +521,22 @@
 }
 
 .banner {
-    background-color: #007bff; 
-    color: white; 
-    padding: 15px; 
-    border-radius: 8px; 
-    text-align: center; 
-    margin-bottom: 20px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-    .banner img {
-        max-width: 60%; /* Ajusta el tamaño de la imagen a 100% */
-        height: auto; /* Mantiene la proporción de la imagen */
-        margin-top: 10px; /* Espacio superior */
-    }
+.banner-logo-pda {
+    max-width: 60%; /* Ajusta el tamaño de la imagen del logo gov */
+    height: auto; /* Mantiene la proporción de la imagen */
+}
+
+.banner-logo-upra {
+    max-width: 80%; /* Ajusta el tamaño de la imagen del logo UPRA */
+    height: auto; /* Mantiene la proporción de la imagen */
+    margin-top: 10px; /* Espacio superior */
+}

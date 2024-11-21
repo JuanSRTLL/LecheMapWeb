@@ -288,11 +288,14 @@ function createTopDepartmentsChart(data) {
         .sort((a, b) => b.y - a.y)
         .slice(0, 10);
 
-    // Crear el gráfico
+    // Crear el gráfico dependiendo del tamaño de la pantalla
+    const isMobile = window.innerWidth <= 768; // Detectar si es móvil
+    const chartType = isMobile ? 'bar' : 'column'; // Gráfico de barras para móviles, columnas para escritorio
+
     Highcharts.chart('topDepartmentsChart', {
         chart: {
-            type: 'column',
-            backgroundColor: '#f9f9f9',
+            type: chartType, // Cambiar tipo de gráfico según el tamaño de pantalla
+            backgroundColor: '#f9f9f9', // Fondo claro
             borderColor: '#ccc',
             borderWidth: 1,
             borderRadius: 5
@@ -308,7 +311,6 @@ function createTopDepartmentsChart(data) {
         xAxis: {
             type: 'category',
             labels: {
-                rotation: -45,
                 style: {
                     fontSize: '13px',
                     color: '#333'
@@ -343,15 +345,15 @@ function createTopDepartmentsChart(data) {
             color: '#2f7ed8',
             dataLabels: {
                 enabled: true,
-                format: '{point.y:.1f} ha',
+                format: '{point.y:.1f} ha', // Formato del texto
                 style: {
-                    color: '#000000',
-                    textOutline: 'none'
+                    color: '#000000', // Cambiar el color a negro
+                    textOutline: 'none' // Sin contorno
                 }
             }
         }],
         plotOptions: {
-            column: {
+            [chartType]: {
                 borderRadius: 5,
                 dataLabels: {
                     enabled: true
@@ -363,8 +365,102 @@ function createTopDepartmentsChart(data) {
 
 window.createTopDepartmentsChart = createTopDepartmentsChart;
 
+function createTopMunicipiosChart(data) {
+    // Agrupar datos por municipio y sumar aptitud_alta_ha
+    const municipioData = {};
+    data.forEach(item => {
+        const municipio = item.municipio;
+        const aptitudAlta = parseFloat(item.aptitud_alta_ha || 0);
+
+        if (!municipioData[municipio]) {
+            municipioData[municipio] = 0;
+        }
+        municipioData[municipio] += aptitudAlta;
+    });
+
+    // Convertir a array y ordenar
+    const sortedData = Object.entries(municipioData)
+        .map(([municipio, value]) => ({ name: municipio, y: value }))
+        .sort((a, b) => b.y - a.y)
+        .slice(0, 10);
+
+    // Crear el gráfico dependiendo del tamaño de la pantalla
+    const isMobile = window.innerWidth <= 768; // Detectar si es móvil
+    const chartType = isMobile ? 'bar' : 'column'; // Gráfico de barras para móviles, columnas para escritorio
+
+    Highcharts.chart('topMunicipiosChart', {
+        chart: {
+            type: chartType, // Cambiar tipo de gráfico según el tamaño de pantalla
+            backgroundColor: '#f9f9f9', // Fondo claro
+            borderColor: '#ccc',
+            borderWidth: 1,
+            borderRadius: 5
+        },
+        title: {
+            text: 'Top 10 Municipios con Mayor Área de Aptitud Alta',
+            style: {
+                fontSize: '18px',
+                fontWeight: 'bold',
+                color: '#333'
+            }
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                style: {
+                    fontSize: '13px',
+                    color: '#333'
+                }
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Hectáreas',
+                style: {
+                    color: '#333'
+                }
+            },
+            labels: {
+                formatter: function () {
+                    return Highcharts.numberFormat(this.value, 0);
+                }
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.point.name + '</b><br/>' +
+                    'Área de aptitud alta: ' + Highcharts.numberFormat(this.y, 0) + ' ha';
+            }
+        },
+        series: [{
+            name: 'Aptitud Alta',
+            data: sortedData,
+            color: '#2f7ed8',
+            dataLabels: {
+                enabled: true,
+                format: '{point.y:.1f} ha', // Formato del texto
+                style: {
+                    color: '#000000', // Cambiar el color a negro
+                    textOutline: 'none' // Sin contorno
+                }
+            }
+        }],
+        plotOptions: {
+            [chartType]: {
+                borderRadius: 5,
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        }
+    });
+}
+
 function endConsultation() {
     // Recargar la página completamente
-    window.location.href = window.location.href.split('?')[0];
+    window.location.href = window.location.href.split('?')[0]; // Esto recarga la página sin parámetros de consulta
     return false; // Evitar el postback del botón
 }
